@@ -1,0 +1,22 @@
+<?php 
+$lang = array(
+ 	'cartthrob_fees_module_name'		=> 'Carthrob Fees', 
+	'cartthrob_fees_module_description'		=> 'Charges fees per transaction', 
+ 	'cartthrob_fees_module_name'	=> 'Carthrob Fees',
+	'nav_head_settings_form'	=> 'Settings',
+	'use_billing_info'	=> 'Use Billing Info',
+	'global_fees'	=> 'CartThrob Global Fees',
+	'fee_name'	=> 'Fee Name',
+	'fee_price'	=> 'Price',
+	'fee_percent'=> '(or) Percent of subtotal',
+	'apply_when'=> 'Apply fee when customer info equals match value',
+	'or_when'	=> '(or) Apply fee when this custom_data/item_options key equals match value',
+	'matches'	=> 'match value (use GLOBAL to match any)',
+	'use_custom_data_key'	=> 'USE CUSTOM DATA FIELD',
+	'any_field'	=> 'ALWAYS APPLY FEE',
+	'fees_item_title'	=> 'Fees line item name',
+	'fees_item_title_note'	=> "All fees are shown lumped together in the cart as a single line item. The name you use to display these items should be a unique identifier, distinct from the titles of other items in the cart. To display multiple fees to the customer, you can use the CartThrob Fees plugin included with this add-on. For documentation on using that fees plugin, please view Add-ons > Plugins > CartThrob Fees Utilities usage information.",
+	'fees_item_taxable'	=> 'Are fees taxable?',
+	'item_options_each'	=> 'USE ITEM OPTIONS (each) ',
+	'item_options_once'	=> 'USE ITEM OPTIONS (once)',
+);
