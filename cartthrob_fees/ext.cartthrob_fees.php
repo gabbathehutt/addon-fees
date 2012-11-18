@@ -168,6 +168,8 @@ class Cartthrob_fees_ext {
 			{
 				continue; 
 			}
+			
+			// field_name is the selector that lets you select from values set in "customer_info, gateway, group_id etc"
 			if (!empty($fee['field_name']) && strtolower(trim($fee['field_name'])) == "auto")
 			{
  				$numeric =  $this->calculate_single($fee); 
@@ -177,13 +179,23 @@ class Cartthrob_fees_ext {
 			}
  			elseif (!empty($fee['custom_data_key']) && $fee['field_name'] == 'custom_data_key')
 			{
-				if (trim($fee['custom_data']) == "GLOBAL" || trim($fee['custom_data']) ==  $this->EE->cartthrob->cart->custom_data(strtolower(trim($fee['custom_data_key']))))
+				$not = FALSE; 
+				if (strpos($fee['custom_data'], "NOT ") !== FALSE)
+				{
+					list($match) = explode("NOT ", $fee['custom_data'], 1); 
+					if (trim($fee['custom_data']) !=  $this->EE->cartthrob->cart->custom_data(strtolower(trim($match))) )
+					{
+						$not = TRUE; 
+					}
+				}
+				if ($not || trim($fee['custom_data']) == "GLOBAL" || trim($fee['custom_data']) ==  $this->EE->cartthrob->cart->custom_data(strtolower(trim($fee['custom_data_key']))))
 				{
 					$numeric =  $this->calculate_single($fee); 
 					$fee['fee_total_numeric'] = $numeric;
 					$fee['fee_total'] = $this->EE->number->format($this->calculate_single($fee));
 					$fees[] = $fee;
 				}
+				
 			}
 			elseif (!empty($fee['custom_data_key']) && ($fee['field_name'] == 'item_options_key_once' || $fee['field_name'] == 'item_options_key_each') )
 			{
@@ -214,7 +226,16 @@ class Cartthrob_fees_ext {
 			}
 			elseif (!empty($fee['field_name']) && $this->EE->cartthrob->cart->customer_info(strtolower(trim($fee['field_name']))))
 			{
-  				if (trim($fee['custom_data']) == "GLOBAL"  || trim($fee['custom_data']) == $this->EE->cartthrob->cart->customer_info(strtolower(trim($fee['field_name']))))
+				$not = FALSE; 
+				if (strpos($fee['custom_data'], "NOT ") !== FALSE)
+				{
+					list($match) = explode("NOT ", $fee['custom_data'], 1); 
+					if (trim($fee['custom_data']) !=  $this->EE->cartthrob->cart->custom_data(strtolower(trim($match))) )
+					{
+						$not = TRUE; 
+					}
+				}
+  				if ($not || trim($fee['custom_data']) == "GLOBAL"  || trim($fee['custom_data']) == $this->EE->cartthrob->cart->customer_info(strtolower(trim($fee['field_name']))))
 				{
 					$numeric =  $this->calculate_single($fee); 
 					$fee['fee_total_numeric'] = $numeric; 
@@ -242,9 +263,10 @@ class Cartthrob_fees_ext {
 			}
 		}
  
- 		if (isset($fees))
+  		if (isset($fees))
 		{
  	  		$this->EE->cartthrob->cart->set_custom_data('cartthrob_fees', $fees); 
+			$this->EE->cartthrob->cart->save(); 
 			$this->fees = $fees; 
 		}
 		return $fees; 
@@ -256,12 +278,12 @@ class Cartthrob_fees_ext {
 	}
 	public function cartthrob_calculate_total()
 	{
-		
-		if (empty($this->settings['fees']))
+  		if (empty($this->settings['fees']))
 		{
-			return FALSE;
+	 		return FALSE; 
 		}
-		$total =  $this->EE->cartthrob->cart->subtotal() + $this->EE->cartthrob->cart->shipping() + $this->EE->cartthrob->cart->tax() - $this->EE->cartthrob->cart->discount();
+		
+		$total = $this->EE->cartthrob->cart->subtotal_with_tax() +  $this->EE->cartthrob->cart->shipping() + $this->EE->cartthrob->cart->shipping_tax() - $this->EE->cartthrob->cart->discount() - $this->EE->cartthrob->cart->discount_tax();
 		
 		/// remove all fees from cart. 
 		foreach ($this->settings['fees'] as $fee)
@@ -330,7 +352,7 @@ class Cartthrob_fees_ext {
  				return $total + $fee_total;  
 			}
 		}
-		return FALSE; 
+  		return $total; 
 	}
 	public function calculate_fee_total()
 	{
